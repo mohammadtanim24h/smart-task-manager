@@ -1,10 +1,17 @@
 import express from "express";
+import { connectDB } from "./config/db.js";
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(express.json());
+
+// Connect Database
+connectDB();
 
 app.get("/", (req, res) => {
-  res.send("Hello from TypeScript Express!");
+  res.send("Server is up and running");
 });
 
 app.listen(PORT, () => {
