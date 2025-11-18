@@ -1,10 +1,18 @@
-import { Link, Outlet } from "react-router-dom"
+import { Link, Outlet, useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { useAuth } from "./hooks/useAuth"
 
 function App() {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout: logoutAuth } = useAuth();
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    logoutAuth()
+    toast.success("Logged out successfully")
+    navigate("/login")
+  }
+  
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 text-gray-900">
       <header className="border-b bg-white">
@@ -34,7 +42,7 @@ function App() {
             )}
             {isLoggedIn && (
               <>
-                <Button size="sm" onClick={logout}>
+                <Button size="sm" onClick={handleLogout}>
                   Logout
                 </Button>
               </>
