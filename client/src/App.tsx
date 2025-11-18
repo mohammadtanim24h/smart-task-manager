@@ -1,8 +1,10 @@
 import { Link, Outlet } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
+import { useAuth } from "./hooks/useAuth"
 
 function App() {
+  const { isLoggedIn, logout } = useAuth();
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 text-gray-900">
       <header className="border-b bg-white">
@@ -17,9 +19,20 @@ function App() {
             <Link to="/tasks" className="hover:text-blue-600">
               Tasks
             </Link>
-            <Button asChild size="sm">
-              <Link to="/register">Register</Link>
-            </Button>
+            {!isLoggedIn && (
+              <>
+                <Button asChild size="sm">
+                  <Link to="/login">Login</Link>
+                </Button>
+              </>
+            )}
+            {isLoggedIn && (
+              <>
+                <Button size="sm" onClick={logout}>
+                  Logout
+                </Button>
+              </>
+            )}
           </nav>
         </div>
       </header>

@@ -4,7 +4,7 @@ type BaseResponse = {
   message?: string
 }
 
-type AuthUser = {
+export type AuthUser = {
   id: string
   name: string
   email: string
