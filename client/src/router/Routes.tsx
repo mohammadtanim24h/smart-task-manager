@@ -1,8 +1,11 @@
-import Tasks from "@/pages/Tasks"
+import { createBrowserRouter } from "react-router-dom"
+
 import App from "@/App"
 import Home from "@/pages/Home"
+import Login from "@/pages/Login"
 import NotFound from "@/pages/NotFound"
-import { createBrowserRouter } from "react-router-dom"
+import Register from "@/pages/Register"
+import Tasks from "@/pages/Tasks"
 
 export const router = createBrowserRouter([
     {
@@ -17,6 +20,14 @@ export const router = createBrowserRouter([
         {
           path: "tasks",
           element: <Tasks />,
+        },
+        {
+          path: "login",
+          element: <Login />,
+        },
+        {
+          path: "register",
+          element: <Register />,
         },
       ],
     },

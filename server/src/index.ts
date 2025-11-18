@@ -2,12 +2,15 @@ import express from "express";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import { protect } from "./middleware/authMiddleware.js";
+import cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
+// CORS
+app.use(cors());
 
 // Connect Database
 connectDB();

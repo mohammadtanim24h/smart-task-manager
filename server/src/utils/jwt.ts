@@ -11,9 +11,14 @@ export interface TokenPayload {
 }
 
 export const generateToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRE,
-  } as jwt.SignOptions);
+  try {
+    return jwt.sign(payload, JWT_SECRET, {
+      expiresIn: JWT_EXPIRE,
+    } as jwt.SignOptions);
+  } catch (error) {
+    console.error("Error generating token:", error);
+    throw new Error("Error generating token");
+  }
 };
 
 export const verifyToken = (token: string): TokenPayload => {
