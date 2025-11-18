@@ -206,3 +206,43 @@ export const teamApi = {
     deleteJSON<TeamResponse>(`/api/teams/${teamId}/members/${memberIndex}`),
 }
 
+export type ProjectTeam = {
+  _id: string
+  name: string
+}
+
+export type Project = {
+  _id: string
+  title: string
+  description: string
+  teamId: string | ProjectTeam
+  createdAt: string
+  updatedAt: string
+}
+
+export type ProjectsResponse = BaseResponse & {
+  projects: Project[]
+}
+
+export type ProjectResponse = BaseResponse & {
+  project: Project
+}
+
+export type CreateProjectPayload = {
+  title: string
+  description: string
+  teamId: string
+}
+
+export const projectApi = {
+  getProjects: (teamId?: string) => {
+    const query = teamId ? `?teamId=${teamId}` : ""
+    return getJSON<ProjectsResponse>(`/api/projects${query}`)
+  },
+  createProject: (payload: CreateProjectPayload) =>
+    postJSON<ProjectResponse>("/api/projects", payload),
+  updateProject: (id: string, payload: Partial<CreateProjectPayload>) =>
+    putJSON<ProjectResponse>(`/api/projects/${id}`, payload),
+  deleteProject: (id: string) => deleteJSON<BaseResponse>(`/api/projects/${id}`),
+}
+

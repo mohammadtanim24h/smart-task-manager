@@ -5,6 +5,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute"
 import Home from "@/pages/Home"
 import Login from "@/pages/Login"
 import NotFound from "@/pages/NotFound"
+import Projects from "@/pages/Projects"
 import Register from "@/pages/Register"
 import Tasks from "@/pages/Tasks"
 import Teams from "@/pages/Teams"
@@ -28,6 +29,14 @@ export const router = createBrowserRouter([
           element: (
             <ProtectedRoute>
               <Teams />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "projects",
+          element: (
+            <ProtectedRoute>
+              <Projects />
             </ProtectedRoute>
           ),
         },
