@@ -25,16 +25,98 @@ export type RegisterPayload = LoginPayload & {
   name: string
 }
 
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem("stm_token")
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  }
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+  return headers
+}
+
 async function postJSON<TResponse>(
   path: string,
   payload: unknown,
 ): Promise<TResponse> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(payload),
+  })
+
+  let data: unknown = null
+  const contentType = response.headers.get("content-type")
+  if (contentType && contentType.includes("application/json")) {
+    data = await response.json()
+  }
+
+  if (!response.ok) {
+    const message =
+      typeof data === "object" && data !== null && "message" in data
+        ? String((data as Record<string, unknown>).message)
+        : "Request failed"
+    throw new Error(message)
+  }
+
+  return data as TResponse
+}
+
+async function getJSON<TResponse>(path: string): Promise<TResponse> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  })
+
+  let data: unknown = null
+  const contentType = response.headers.get("content-type")
+  if (contentType && contentType.includes("application/json")) {
+    data = await response.json()
+  }
+
+  if (!response.ok) {
+    const message =
+      typeof data === "object" && data !== null && "message" in data
+        ? String((data as Record<string, unknown>).message)
+        : "Request failed"
+    throw new Error(message)
+  }
+
+  return data as TResponse
+}
+
+async function putJSON<TResponse>(
+  path: string,
+  payload: unknown,
+): Promise<TResponse> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  })
+
+  let data: unknown = null
+  const contentType = response.headers.get("content-type")
+  if (contentType && contentType.includes("application/json")) {
+    data = await response.json()
+  }
+
+  if (!response.ok) {
+    const message =
+      typeof data === "object" && data !== null && "message" in data
+        ? String((data as Record<string, unknown>).message)
+        : "Request failed"
+    throw new Error(message)
+  }
+
+  return data as TResponse
+}
+
+async function deleteJSON<TResponse>(path: string): Promise<TResponse> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
   })
 
   let data: unknown = null
@@ -66,5 +148,61 @@ export const authStorage = {
     localStorage.setItem("stm_token", auth.token)
     localStorage.setItem("stm_user", JSON.stringify(auth.user))
   },
+}
+
+export type TeamMember = {
+  name: string
+  role: string
+  capacity: number
+}
+
+export type Team = {
+  _id: string
+  name: string
+  ownerId: string
+  members: TeamMember[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type TeamsResponse = BaseResponse & {
+  teams: Team[]
+}
+
+export type TeamResponse = BaseResponse & {
+  team: Team
+}
+
+export type CreateTeamPayload = {
+  name: string
+  members?: TeamMember[]
+}
+
+export type AddMemberPayload = {
+  name: string
+  role: string
+  capacity: number
+}
+
+export const teamApi = {
+  getTeams: () => getJSON<TeamsResponse>("/api/teams"),
+  createTeam: (payload: CreateTeamPayload) =>
+    postJSON<TeamResponse>("/api/teams", payload),
+  updateTeam: (id: string, payload: Partial<CreateTeamPayload>) =>
+    putJSON<TeamResponse>(`/api/teams/${id}`, payload),
+  deleteTeam: (id: string) => deleteJSON<BaseResponse>(`/api/teams/${id}`),
+  addMember: (teamId: string, payload: AddMemberPayload) =>
+    postJSON<TeamResponse>(`/api/teams/${teamId}/members`, payload),
+  updateMember: (
+    teamId: string,
+    memberIndex: number,
+    payload: Partial<AddMemberPayload>,
+  ) =>
+    putJSON<TeamResponse>(
+      `/api/teams/${teamId}/members/${memberIndex}`,
+      payload,
+    ),
+  deleteMember: (teamId: string, memberIndex: number) =>
+    deleteJSON<TeamResponse>(`/api/teams/${teamId}/members/${memberIndex}`),
 }
 

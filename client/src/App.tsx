@@ -19,6 +19,9 @@ function App() {
             <Link to="/tasks" className="hover:text-blue-600">
               Tasks
             </Link>
+            <Link to="/teams" className="hover:text-blue-600">
+              Teams
+            </Link>
             {!isLoggedIn && (
               <>
                 <Button asChild size="sm">

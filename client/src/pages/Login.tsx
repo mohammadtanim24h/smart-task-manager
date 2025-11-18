@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { authApi, authStorage } from "@/lib/api"
+import { authApi } from "@/lib/api"
+import { useAuth } from "@/hooks/useAuth"
 
 type LoginFormState = {
   email: string
@@ -14,6 +15,7 @@ type LoginFormState = {
 
 export default function Login() {
   const navigate = useNavigate()
+  const { login: setAuth } = useAuth()
   const [formState, setFormState] = useState<LoginFormState>({
     email: "",
     password: "",
@@ -35,7 +37,7 @@ export default function Login() {
 
     try {
       const response = await authApi.login(formState)
-      authStorage.persist(response)
+      setAuth(response)
       setSuccess(response.message ?? "Login successful. Redirecting...")
       setTimeout(() => navigate("/tasks", { replace: true }), 600)
     } catch (err) {

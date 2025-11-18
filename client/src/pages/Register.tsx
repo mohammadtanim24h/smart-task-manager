@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { authApi, authStorage } from "@/lib/api"
+import { authApi } from "@/lib/api"
+import { useAuth } from "@/hooks/useAuth"
 
 type RegisterFormState = {
   name: string
@@ -15,6 +16,7 @@ type RegisterFormState = {
 
 export default function Register() {
   const navigate = useNavigate()
+  const { login: setAuth } = useAuth()
   const [formState, setFormState] = useState<RegisterFormState>({
     name: "",
     email: "",
@@ -37,7 +39,7 @@ export default function Register() {
 
     try {
       const response = await authApi.register(formState)
-      authStorage.persist(response)
+      setAuth(response)
       setSuccess(response.message ?? "Account created. Redirecting...")
       setTimeout(() => navigate("/tasks", { replace: true }), 600)
     } catch (err) {

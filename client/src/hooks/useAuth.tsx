@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react"
-import type { AuthUser } from "@/lib/api"
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import type { AuthUser, AuthResponse } from "@/lib/api"
 
-type UseAuthReturn = {
+type AuthContextType = {
   isLoggedIn: boolean
   user: AuthUser | null
   token: string | null
+  login: (auth: AuthResponse) => void
   logout: () => void
 }
 
@@ -33,11 +34,13 @@ function getTokenFromStorage(): string | null {
   return localStorage.getItem(STORAGE_KEYS.TOKEN)
 }
 
-/**
- * Custom hook to check if user is logged in by checking localStorage
- * @returns Object containing isLoggedIn status, user data, token, and logout function
- */
-export function useAuth(): UseAuthReturn {
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+type AuthProviderProps = {
+  children: ReactNode
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(() => getUserFromStorage())
   const [token, setToken] = useState<string | null>(() => getTokenFromStorage())
 
@@ -56,6 +59,13 @@ export function useAuth(): UseAuthReturn {
     return () => window.removeEventListener("storage", handleStorageChange)
   }, [])
 
+  const login = (auth: AuthResponse) => {
+    localStorage.setItem(STORAGE_KEYS.TOKEN, auth.token)
+    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(auth.user))
+    setUser(auth.user)
+    setToken(auth.token)
+  }
+
   const logout = () => {
     localStorage.removeItem(STORAGE_KEYS.TOKEN)
     localStorage.removeItem(STORAGE_KEYS.USER)
@@ -63,13 +73,24 @@ export function useAuth(): UseAuthReturn {
     setToken(null)
   }
 
-  const isLoggedIn = Boolean(user && token)
+  const isLoggedIn = !!(user && token)
 
-  return {
-    isLoggedIn,
-    user,
-    token,
-    logout,
+  return (
+    <AuthContext.Provider value={{ isLoggedIn, user, token, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+/**
+ * Custom hook to check if user is logged in by checking localStorage
+ * @returns Object containing isLoggedIn status, user data, token, and logout function
+ */
+export function useAuth(): AuthContextType {
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider")
   }
+  return context
 }
 
