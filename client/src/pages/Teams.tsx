@@ -11,11 +11,15 @@ export default function Teams() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false)
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     role: "",
     capacity: "",
+  })
+  const [createTeamFormData, setCreateTeamFormData] = useState({
+    name: "",
   })
 
   useEffect(() => {
@@ -45,6 +49,31 @@ export default function Teams() {
     setIsModalOpen(false)
     setSelectedTeamId(null)
     setFormData({ name: "", role: "", capacity: "" })
+  }
+
+  const handleOpenCreateTeamModal = () => {
+    setIsCreateTeamModalOpen(true)
+    setCreateTeamFormData({ name: "" })
+  }
+
+  const handleCloseCreateTeamModal = () => {
+    setIsCreateTeamModalOpen(false)
+    setCreateTeamFormData({ name: "" })
+  }
+
+  const handleCreateTeam = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await teamApi.createTeam({
+        name: createTeamFormData.name.trim(),
+      })
+
+      await loadTeams()
+      handleCloseCreateTeamModal()
+      setError(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create team")
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,11 +129,31 @@ export default function Teams() {
   return (
     <section className="flex flex-1 flex-col gap-4">
       <header>
-        <p className="text-sm uppercase tracking-wide text-gray-500">Teams</p>
-        <h1 className="text-3xl font-bold text-gray-900">Team Management</h1>
-        <p className="mt-2 text-gray-600">
-          Manage your teams and their members. Add members to track capacity and roles.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-wide text-gray-500">Teams</p>
+            <h1 className="text-3xl font-bold text-gray-900">Team Management</h1>
+            <p className="mt-2 text-gray-600">
+              Manage your teams and their members. Add members to track capacity and roles.
+            </p>
+          </div>
+          <Button onClick={handleOpenCreateTeamModal}>
+            <svg
+              className="mr-2 h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Create Team
+          </Button>
+        </div>
       </header>
 
       {error && (
@@ -249,6 +298,38 @@ export default function Teams() {
               Cancel
             </Button>
             <Button type="submit">Add Member</Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        isOpen={isCreateTeamModalOpen}
+        onClose={handleCloseCreateTeamModal}
+        title="Create New Team"
+      >
+        <form onSubmit={handleCreateTeam} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="teamName">Team Name</Label>
+            <Input
+              id="teamName"
+              type="text"
+              placeholder="Enter team name"
+              value={createTeamFormData.name}
+              onChange={(e) =>
+                setCreateTeamFormData({ name: e.target.value })
+              }
+              required
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCloseCreateTeamModal}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Create Team</Button>
           </div>
         </form>
       </Modal>

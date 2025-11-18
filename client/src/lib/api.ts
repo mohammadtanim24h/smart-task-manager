@@ -246,3 +246,58 @@ export const projectApi = {
   deleteProject: (id: string) => deleteJSON<BaseResponse>(`/api/projects/${id}`),
 }
 
+export type AssignedUser = {
+  _id: string
+  name: string
+  email: string
+}
+
+export type TaskProject = {
+  _id: string
+  title: string
+}
+
+export type Task = {
+  _id: string
+  projectId: string | TaskProject
+  title: string
+  description: string
+  assignedMemberId?: string | AssignedUser | null
+  priority: "Low" | "Medium" | "High"
+  status: "Pending" | "In Progress" | "Done"
+  createdAt: string
+  updatedAt: string
+}
+
+export type TasksResponse = BaseResponse & {
+  tasks: Task[]
+}
+
+export type TaskResponse = BaseResponse & {
+  task: Task
+}
+
+export type CreateTaskPayload = {
+  projectId: string
+  title: string
+  description: string
+  assignedMemberId?: string | null
+  priority?: "Low" | "Medium" | "High"
+  status?: "Pending" | "In Progress" | "Done"
+}
+
+export const taskApi = {
+  getTasks: (projectId?: string, assignedMemberId?: string) => {
+    const params = new URLSearchParams()
+    if (projectId) params.append("projectId", projectId)
+    if (assignedMemberId) params.append("assignedMemberId", assignedMemberId)
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return getJSON<TasksResponse>(`/api/tasks${query}`)
+  },
+  createTask: (payload: CreateTaskPayload) =>
+    postJSON<TaskResponse>("/api/tasks", payload),
+  updateTask: (id: string, payload: Partial<CreateTaskPayload>) =>
+    putJSON<TaskResponse>(`/api/tasks/${id}`, payload),
+  deleteTask: (id: string) => deleteJSON<BaseResponse>(`/api/tasks/${id}`),
+}
+
