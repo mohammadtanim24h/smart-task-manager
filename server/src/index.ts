@@ -2,6 +2,7 @@ import express from "express";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import { protect } from "./middleware/authMiddleware.js";
+import teamRoutes from "./routes/teamRoutes.js";
 import cors from "cors";
 
 const app = express();
@@ -22,6 +23,9 @@ app.get("/", (req, res) => {
 
 // Auth routes
 app.use("/api/auth", authRoutes);
+
+// Team routes (protected)
+app.use("/api/teams", teamRoutes);
 
 // Protected route example
 app.get("/api/me", protect, (req, res) => {
