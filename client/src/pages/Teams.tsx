@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Modal } from "@/components/ui/modal"
-import { teamApi, type Team, type TeamMember } from "@/lib/api"
+import { teamApi, type Team } from "@/lib/api"
 
 export default function Teams() {
   const [teams, setTeams] = useState<Team[]>([])
