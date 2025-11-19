@@ -13,6 +13,8 @@ export default function Tasks() {
   const [error, setError] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [filterProjectId, setFilterProjectId] = useState<string>("")
+  const [filterMemberId, setFilterMemberId] = useState<string>("")
   const [formData, setFormData] = useState({
     projectId: "",
     title: "",
@@ -171,6 +173,56 @@ export default function Tasks() {
     }
   }
 
+  // Extract unique members from tasks
+  const getUniqueMembers = (): AssignedUser[] => {
+    const memberMap = new Map<string, AssignedUser>()
+    tasks.forEach((task) => {
+      if (task.assignedMemberId && typeof task.assignedMemberId === "object") {
+        const member = task.assignedMemberId
+        if (!memberMap.has(member._id)) {
+          memberMap.set(member._id, member)
+        }
+      }
+    })
+    return Array.from(memberMap.values())
+  }
+
+  // Filter tasks based on selected filters
+  const filteredTasks = tasks.filter((task) => {
+    // Filter by project
+    if (filterProjectId) {
+      const taskProjectId =
+        typeof task.projectId === "object" ? task.projectId._id : task.projectId
+      if (taskProjectId !== filterProjectId) {
+        return false
+      }
+    }
+
+    // Filter by member
+    if (filterMemberId) {
+      if (filterMemberId === "unassigned") {
+        // Show only unassigned tasks
+        if (task.assignedMemberId) {
+          return false
+        }
+      } else {
+        // Show only tasks assigned to the selected member
+        if (!task.assignedMemberId) {
+          return false
+        }
+        const taskMemberId =
+          typeof task.assignedMemberId === "object"
+            ? task.assignedMemberId._id
+            : task.assignedMemberId
+        if (taskMemberId !== filterMemberId) {
+          return false
+        }
+      }
+    }
+
+    return true
+  })
+
   if (loading) {
     return (
       <section className="flex flex-1 flex-col gap-4">
@@ -223,13 +275,70 @@ export default function Tasks() {
         <div className="rounded-lg border border-dashed border-gray-300 bg-white p-6 text-center text-gray-500">
           No projects found. Please create a project first before creating tasks.
         </div>
-      ) : tasks.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-6 text-center text-gray-500">
-          No tasks found. Create a task to get started.
-        </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {tasks.map((task) => (
+        <>
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4 rounded-lg border bg-white p-4">
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="filter-project" className="text-sm font-medium text-gray-700">
+                Filter by Project
+              </Label>
+              <select
+                id="filter-project"
+                value={filterProjectId}
+                onChange={(e) => setFilterProjectId(e.target.value)}
+                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">All Projects</option>
+                {projects.map((project) => (
+                  <option key={project._id} value={project._id}>
+                    {project.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="filter-member" className="text-sm font-medium text-gray-700">
+                Filter by Member
+              </Label>
+              <select
+                id="filter-member"
+                value={filterMemberId}
+                onChange={(e) => setFilterMemberId(e.target.value)}
+                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">All Members</option>
+                {getUniqueMembers().map((member) => (
+                  <option key={member._id} value={member._id}>
+                    {member.name}
+                  </option>
+                ))}
+                <option value="unassigned">Unassigned</option>
+              </select>
+            </div>
+            {(filterProjectId || filterMemberId) && (
+              <div className="flex items-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setFilterProjectId("")
+                    setFilterMemberId("")
+                  }}
+                  className="h-10"
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {filteredTasks.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-gray-300 bg-white p-6 text-center text-gray-500">
+              No tasks found matching the selected filters.
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredTasks.map((task) => (
             <Card key={task._id}>
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -324,8 +433,10 @@ export default function Tasks() {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <Modal
