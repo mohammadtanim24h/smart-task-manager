@@ -7,7 +7,7 @@ export interface ITask extends mongoose.Document {
   projectId: mongoose.Types.ObjectId;
   title: string;
   description: string;
-  assignedMemberId?: mongoose.Types.ObjectId;
+  assignedMemberName?: string | null;
   priority: Priority;
   status: Status;
   createdAt: Date;
@@ -31,10 +31,10 @@ const taskSchema = new mongoose.Schema<ITask>(
       required: [true, "Task description is required"],
       trim: true,
     },
-    assignedMemberId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    assignedMemberName: {
+      type: String,
       default: null,
+      trim: true,
     },
     priority: {
       type: String,

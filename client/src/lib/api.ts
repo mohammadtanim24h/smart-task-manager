@@ -228,6 +228,17 @@ export type ProjectResponse = BaseResponse & {
   project: Project
 }
 
+export type ProjectMember = {
+  name: string
+  role: string
+  capacity: number
+  currentTasks: number
+}
+
+export type ProjectMembersResponse = BaseResponse & {
+  members: ProjectMember[]
+}
+
 export type CreateProjectPayload = {
   title: string
   description: string
@@ -239,6 +250,8 @@ export const projectApi = {
     const query = teamId ? `?teamId=${teamId}` : ""
     return getJSON<ProjectsResponse>(`/api/projects${query}`)
   },
+  getProjectMembers: (projectId: string) =>
+    getJSON<ProjectMembersResponse>(`/api/projects/${projectId}/members`),
   createProject: (payload: CreateProjectPayload) =>
     postJSON<ProjectResponse>("/api/projects", payload),
   updateProject: (id: string, payload: Partial<CreateProjectPayload>) =>
@@ -262,7 +275,7 @@ export type Task = {
   projectId: string | TaskProject
   title: string
   description: string
-  assignedMemberId?: string | AssignedUser | null
+  assignedMemberName?: string | null
   priority: "Low" | "Medium" | "High"
   status: "Pending" | "In Progress" | "Done"
   createdAt: string
@@ -281,16 +294,16 @@ export type CreateTaskPayload = {
   projectId: string
   title: string
   description: string
-  assignedMemberId?: string | null
+  assignedMemberName?: string | null
   priority?: "Low" | "Medium" | "High"
   status?: "Pending" | "In Progress" | "Done"
 }
 
 export const taskApi = {
-  getTasks: (projectId?: string, assignedMemberId?: string) => {
+  getTasks: (projectId?: string, assignedMemberName?: string) => {
     const params = new URLSearchParams()
     if (projectId) params.append("projectId", projectId)
-    if (assignedMemberId) params.append("assignedMemberId", assignedMemberId)
+    if (assignedMemberName) params.append("assignedMemberName", assignedMemberName)
     const query = params.toString() ? `?${params.toString()}` : ""
     return getJSON<TasksResponse>(`/api/tasks${query}`)
   },

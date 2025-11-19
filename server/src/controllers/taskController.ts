@@ -14,7 +14,7 @@ const verifyProjectAccess = async (projectId: string, userId: string): Promise<b
 
 export const createTask = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { projectId, title, description, assignedMemberId, priority, status } = req.body;
+    const { projectId, title, description, assignedMemberName, priority, status } = req.body;
 
     if (!req.user?.id) {
       res.status(401).json({ message: "Not authorized" });
@@ -47,7 +47,7 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       projectId,
       title: title.trim(),
       description: description.trim(),
-      assignedMemberId: assignedMemberId || null,
+      assignedMemberName: assignedMemberName || null,
       priority: priority || "Low",
       status: status || "Pending",
     });
@@ -74,7 +74,7 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const { projectId, assignedMemberId } = req.query;
+    const { projectId, assignedMemberName } = req.query;
 
     // Get all teams owned by the user
     const userTeams = await Team.find({ ownerId: req.user.id });
@@ -98,13 +98,12 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Filter by assignedMemberId if provided
-    if (assignedMemberId) {
-      query.assignedMemberId = assignedMemberId;
+    if (assignedMemberName) {
+      query.assignedMemberName = assignedMemberName;
     }
 
     const tasks = await Task.find(query)
       .populate("projectId", "title")
-      .populate("assignedMemberId", "name email")
       .sort({ createdAt: -1 });
 
     res.status(200).json({ tasks });
@@ -122,7 +121,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     }
 
     const { id } = req.params;
-    const { title, description, assignedMemberId, priority, status, projectId } = req.body;
+    const { title, description, assignedMemberName, priority, status, projectId } = req.body;
 
     // Find the task
     const task = await Task.findById(id);
@@ -157,8 +156,8 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
       task.description = description.trim();
     }
 
-    if (assignedMemberId !== undefined) {
-      task.assignedMemberId = assignedMemberId || null;
+    if (assignedMemberName !== undefined) {
+      task.assignedMemberName = assignedMemberName || null;
     }
 
     if (priority && ["Low", "Medium", "High"].includes(priority)) {

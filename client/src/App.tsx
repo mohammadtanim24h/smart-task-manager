@@ -22,7 +22,7 @@ function App() {
           </Link>
           <nav className="flex items-center gap-4 text-sm font-medium">
             <Link to="/" className="hover:text-blue-600">
-              Dashboard
+              Home
             </Link>
             <Link to="/tasks" className="hover:text-blue-600">
               Tasks

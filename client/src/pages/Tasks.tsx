@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Modal } from "@/components/ui/modal"
-import { taskApi, projectApi, type Task, type Project, type AssignedUser } from "@/lib/api"
+import { taskApi, projectApi, type Task, type Project, type ProjectMember } from "@/lib/api"
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -19,14 +19,42 @@ export default function Tasks() {
     projectId: "",
     title: "",
     description: "",
-    assignedMemberId: "",
+    assignedMemberName: "",
     priority: "Low" as "Low" | "Medium" | "High",
     status: "Pending" as "Pending" | "In Progress" | "Done",
   })
 
+  const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([])
+  const [membersLoading, setMembersLoading] = useState(false)
+
   useEffect(() => {
     loadData()
   }, [])
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      if (!isModalOpen || !formData.projectId) {
+        setProjectMembers([])
+        return
+      }
+      try {
+        setMembersLoading(true)
+        const res = await projectApi.getProjectMembers(formData.projectId)
+        const members = res.members ?? []
+        const currentName = formData.assignedMemberName
+        const hasCurrent = currentName ? members.some((m) => m.name === currentName) : true
+        setProjectMembers(
+          hasCurrent || !currentName
+            ? members
+            : [...members, { name: currentName, role: "", capacity: 0, currentTasks: 0 }]
+        )
+      } catch (err) {
+      } finally {
+        setMembersLoading(false)
+      }
+    }
+    fetchMembers()
+  }, [isModalOpen, formData.projectId, formData.assignedMemberName])
 
   const loadData = async () => {
     try {
@@ -48,26 +76,31 @@ export default function Tasks() {
   const handleOpenModal = (task?: Task) => {
     if (task) {
       setEditingTask(task)
-      const assignedMemberId =
-        typeof task.assignedMemberId === "object" && task.assignedMemberId
-          ? task.assignedMemberId._id
-          : task.assignedMemberId || ""
+      const assignedMemberName =
+        task.assignedMemberName
+          ? task.assignedMemberName : ""
       setFormData({
         projectId:
           typeof task.projectId === "object" ? task.projectId._id : task.projectId,
         title: task.title,
         description: task.description,
-        assignedMemberId,
+        assignedMemberName,
         priority: task.priority,
         status: task.status,
       })
+      if (assignedMemberName) {
+        setProjectMembers((prev) => {
+          const exists = prev.some((m) => m.name === assignedMemberName)
+          return exists ? prev : [...prev, { name: assignedMemberName, role: "", capacity: 0, currentTasks: 0 }]
+        })
+      }
     } else {
       setEditingTask(null)
       setFormData({
         projectId: "",
         title: "",
         description: "",
-        assignedMemberId: "",
+        assignedMemberName: "",
         priority: "Low",
         status: "Pending",
       })
@@ -82,7 +115,7 @@ export default function Tasks() {
       projectId: "",
       title: "",
       description: "",
-      assignedMemberId: "",
+      assignedMemberName: "",
       priority: "Low",
       status: "Pending",
     })
@@ -101,7 +134,7 @@ export default function Tasks() {
         projectId: formData.projectId,
         title: formData.title.trim(),
         description: formData.description.trim(),
-        assignedMemberId: formData.assignedMemberId || null,
+        assignedMemberName: formData.assignedMemberName || null,
         priority: formData.priority,
         status: formData.status,
       }
@@ -132,11 +165,7 @@ export default function Tasks() {
   }
 
   const getAssignedMemberName = (task: Task): string => {
-    if (!task.assignedMemberId) return "Unassigned"
-    if (typeof task.assignedMemberId === "object") {
-      return task.assignedMemberId.name || "Unknown"
-    }
-    return "Unassigned"
+    return task.assignedMemberName || "Unassigned"
   }
 
   const getProjectName = (task: Task): string => {
@@ -173,18 +202,15 @@ export default function Tasks() {
     }
   }
 
-  // Extract unique members from tasks
-  const getUniqueMembers = (): AssignedUser[] => {
-    const memberMap = new Map<string, AssignedUser>()
+  // Extract unique member names from tasks
+  const getUniqueMembers = (): string[] => {
+    const names = new Set<string>()
     tasks.forEach((task) => {
-      if (task.assignedMemberId && typeof task.assignedMemberId === "object") {
-        const member = task.assignedMemberId
-        if (!memberMap.has(member._id)) {
-          memberMap.set(member._id, member)
-        }
+      if (task.assignedMemberName) {
+        names.add(task.assignedMemberName)
       }
     })
-    return Array.from(memberMap.values())
+    return Array.from(names.values())
   }
 
   // Filter tasks based on selected filters
@@ -201,20 +227,14 @@ export default function Tasks() {
     // Filter by member
     if (filterMemberId) {
       if (filterMemberId === "unassigned") {
-        // Show only unassigned tasks
-        if (task.assignedMemberId) {
+        if (task.assignedMemberName) {
           return false
         }
       } else {
-        // Show only tasks assigned to the selected member
-        if (!task.assignedMemberId) {
+        if (!task.assignedMemberName) {
           return false
         }
-        const taskMemberId =
-          typeof task.assignedMemberId === "object"
-            ? task.assignedMemberId._id
-            : task.assignedMemberId
-        if (taskMemberId !== filterMemberId) {
+        if (task.assignedMemberName !== filterMemberId) {
           return false
         }
       }
@@ -308,9 +328,9 @@ export default function Tasks() {
                 className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="">All Members</option>
-                {getUniqueMembers().map((member) => (
-                  <option key={member._id} value={member._id}>
-                    {member.name}
+                {getUniqueMembers().map((name) => (
+                  <option key={name} value={name}>
+                    {name}
                   </option>
                 ))}
                 <option value="unassigned">Unassigned</option>
@@ -494,18 +514,28 @@ export default function Tasks() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="assignedMemberId">Assigned Member ID (Optional)</Label>
-            <Input
+            <Label htmlFor="assignedMemberId">Assigned Member (Optional)</Label>
+            <select
               id="assignedMemberId"
-              type="text"
-              placeholder="User ID (leave empty for unassigned)"
-              value={formData.assignedMemberId}
+              value={formData.assignedMemberName}
               onChange={(e) =>
-                setFormData({ ...formData, assignedMemberId: e.target.value })
+                setFormData({ ...formData, assignedMemberName: e.target.value })
               }
-            />
+              disabled={!formData.projectId || membersLoading}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">Unassigned</option>
+              {projectMembers.map((member, idx) => (
+                <option
+                  key={idx}
+                  value={member.name || ""}
+                >
+                  {`${member.name} - ${member.currentTasks}/${member.capacity}`}
+                </option>
+              ))}
+            </select>
             <p className="text-xs text-gray-500">
-              Enter the user ID to assign this task. Leave empty to keep unassigned.
+              Select a project to load its team members.
             </p>
           </div>
 

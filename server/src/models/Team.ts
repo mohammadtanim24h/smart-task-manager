@@ -4,6 +4,7 @@ export interface IMember {
   name: string;
   role: string;
   capacity: number;
+  userId?: mongoose.Types.ObjectId;
 }
 
 export interface ITeam extends mongoose.Document {
@@ -30,6 +31,11 @@ const memberSchema = new mongoose.Schema<IMember>(
       type: Number,
       required: [true, "Member capacity is required"],
       min: [0, "Capacity must be a positive number"],
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
     },
   },
   { _id: false }

@@ -11,16 +11,15 @@ export default function Home() {
         <h1 className="text-3xl font-bold text-gray-900">
           Organize your team&apos;s work
         </h1>
-        <p className="mt-2 text-gray-600">
+        {/* <p className="mt-2 text-gray-600">
           Jump into the dashboard to see what&apos;s coming up or head
           straight to the task board to make updates.
-        </p>
+        </p> */}
       </div>
       <div className="flex flex-wrap gap-3">
         <Button asChild>
           <Link to="/tasks">View tasks</Link>
         </Button>
-        <Button variant="outline">Create project</Button>
       </div>
     </section>
   )

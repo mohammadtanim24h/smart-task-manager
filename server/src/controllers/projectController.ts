@@ -1,6 +1,7 @@
 import { type Request, type Response } from "express";
 import { Project } from "../models/Project.js";
 import { Team } from "../models/Team.js";
+import { Task } from "../models/Task.js";
 
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -183,6 +184,48 @@ export const deleteProject = async (req: Request, res: Response): Promise<void> 
   } catch (error) {
     console.error("Delete project error:", error);
     res.status(500).json({ message: "Server error while deleting project" });
+  }
+};
+
+export const getProjectMembers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user?.id) {
+      res.status(401).json({ message: "Not authorized" });
+      return;
+    }
+
+    const { id } = req.params;
+    const project = await Project.findById(id);
+    if (!project) {
+      res.status(404).json({ message: "Project not found" });
+      return;
+    }
+
+    const team = await Team.findOne({ _id: project.teamId, ownerId: req.user.id });
+    if (!team) {
+      res.status(403).json({ message: "You don't have access to this project" });
+      return;
+    }
+
+    const members = await Promise.all(
+      team.members.map(async (m) => {
+        const currentTasks = await Task.countDocuments({
+          projectId: project._id,
+          assignedMemberName: m.name,
+        });
+        return {
+          name: m.name,
+          role: m.role,
+          capacity: m.capacity,
+          currentTasks,
+        };
+      })
+    );
+
+    res.status(200).json({ members });
+  } catch (error) {
+    console.error("Get project members error:", error);
+    res.status(500).json({ message: "Server error while fetching project members" });
   }
 };
 
