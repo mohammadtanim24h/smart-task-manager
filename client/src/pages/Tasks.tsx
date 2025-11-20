@@ -29,6 +29,38 @@ export default function Tasks() {
   const [isCapacityWarningOpen, setIsCapacityWarningOpen] = useState(false)
   const [pendingAssignedMemberName, setPendingAssignedMemberName] = useState<string>("")
 
+  const autoAssignLowestWorkload = async () => {
+    if (!formData.projectId) return
+    try {
+      setMembersLoading(true)
+      const res = await projectApi.getProjectMembers(formData.projectId)
+      const members = res.members ?? []
+      if (members.length === 0) {
+        setFormData({ ...formData, assignedMemberName: "" })
+        return
+      }
+      const chosen = members
+        .slice()
+        .sort((a, b) => {
+          if (a.currentTasks !== b.currentTasks) return a.currentTasks - b.currentTasks
+          const ar = a.capacity - a.currentTasks
+          const br = b.capacity - b.currentTasks
+          if (ar !== br) return br - ar
+          return a.name.localeCompare(b.name)
+        })[0]
+      const overCapacity = chosen.currentTasks >= chosen.capacity
+      if (overCapacity) {
+        setPendingAssignedMemberName(chosen.name)
+        setIsCapacityWarningOpen(true)
+      } else {
+        setFormData({ ...formData, assignedMemberName: chosen.name })
+      }
+    } catch {
+    } finally {
+      setMembersLoading(false)
+    }
+  }
+
   useEffect(() => {
     loadData()
   }, [])
@@ -516,9 +548,9 @@ export default function Tasks() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="assignedMemberId">Assigned Member (Optional)</Label>
+            <Label htmlFor="assignedMemberName">Assigned Member (Optional)</Label>
             <select
-              id="assignedMemberId"
+              id="assignedMemberName"
               value={formData.assignedMemberName}
               onChange={(e) => {
                 const next = e.target.value
@@ -548,6 +580,16 @@ export default function Tasks() {
                 </option>
               ))}
             </select>
+            <div className="flex gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={autoAssignLowestWorkload}
+                disabled={!formData.projectId || membersLoading}
+              >
+                Auto Assign
+              </Button>
+            </div>
             <p className="text-xs text-gray-500">
               Select a project to load its team members.
             </p>

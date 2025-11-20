@@ -19,7 +19,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
     >
       <div
         className={cn(
-          "relative w-full max-w-md rounded-lg bg-white p-6 shadow-lg",
+          "relative w-full max-w-md rounded-lg bg-white p-6 shadow-lg max-h-[80vh] overflow-y-auto",
           className,
         )}
         onClick={(e) => e.stopPropagation()}
