@@ -313,5 +313,7 @@ export const taskApi = {
   updateTask: (id: string, payload: Partial<CreateTaskPayload>) =>
     putJSON<TaskResponse>(`/api/tasks/${id}`, payload),
   deleteTask: (id: string) => deleteJSON<BaseResponse>(`/api/tasks/${id}`),
+  reassignTasks: (projectId?: string) =>
+    postJSON<TasksResponse>("/api/tasks/reassign", projectId ? { projectId } : {}),
 }
 

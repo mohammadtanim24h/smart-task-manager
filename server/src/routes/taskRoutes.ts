@@ -4,6 +4,7 @@ import {
   deleteTask,
   getTasks,
   updateTask,
+  reassignTasks,
 } from "../controllers/taskController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -13,6 +14,7 @@ router.use(protect);
 
 router.post("/", createTask);
 router.get("/", getTasks);
+router.post("/reassign", reassignTasks);
 router.put("/:id", updateTask);
 router.delete("/:id", deleteTask);
 

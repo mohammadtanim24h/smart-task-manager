@@ -198,6 +198,22 @@ export default function Tasks() {
     }
   }
 
+  const handleReassignTasks = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const res = await taskApi.reassignTasks(filterProjectId || undefined)
+      await loadData()
+      if (res.message) {
+        // no-op, message available if needed
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to reassign tasks")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const getAssignedMemberName = (task: Task): string => {
     return task.assignedMemberName || "Unassigned"
   }
@@ -301,6 +317,7 @@ export default function Tasks() {
             Manage your tasks, track progress, and assign work to team members.
           </p>
         </div>
+        <div className="flex gap-2">
         <Button onClick={() => handleOpenModal()} disabled={projects.length === 0}>
           <svg
             className="mr-2 h-4 w-4"
@@ -317,6 +334,10 @@ export default function Tasks() {
           </svg>
           Create Task
         </Button>
+        <Button variant="outline" onClick={handleReassignTasks} disabled={projects.length === 0}>
+          Reassign Tasks
+        </Button>
+        </div>
       </header>
 
       {error && (
