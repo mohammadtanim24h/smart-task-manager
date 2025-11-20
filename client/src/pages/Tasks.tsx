@@ -26,6 +26,8 @@ export default function Tasks() {
 
   const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([])
   const [membersLoading, setMembersLoading] = useState(false)
+  const [isCapacityWarningOpen, setIsCapacityWarningOpen] = useState(false)
+  const [pendingAssignedMemberName, setPendingAssignedMemberName] = useState<string>("")
 
   useEffect(() => {
     loadData()
@@ -518,9 +520,21 @@ export default function Tasks() {
             <select
               id="assignedMemberId"
               value={formData.assignedMemberName}
-              onChange={(e) =>
-                setFormData({ ...formData, assignedMemberName: e.target.value })
-              }
+              onChange={(e) => {
+                const next = e.target.value
+                if (!next) {
+                  setFormData({ ...formData, assignedMemberName: "" })
+                  return
+                }
+                const member = projectMembers.find((m) => (m.name || "") === next)
+                const overCapacity = member ? member.currentTasks >= member.capacity : false
+                if (overCapacity) {
+                  setPendingAssignedMemberName(next)
+                  setIsCapacityWarningOpen(true)
+                } else {
+                  setFormData({ ...formData, assignedMemberName: next })
+                }
+              }}
               disabled={!formData.projectId || membersLoading}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -586,6 +600,38 @@ export default function Tasks() {
             <Button type="submit">{editingTask ? "Update Task" : "Create Task"}</Button>
           </div>
         </form>
+      </Modal>
+      <Modal
+        isOpen={isCapacityWarningOpen}
+        onClose={() => setIsCapacityWarningOpen(false)}
+        title={"Member Over Capacity"}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-700">
+            The selected member is at or over their capacity.
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsCapacityWarningOpen(false)
+              }}
+            >
+              Choose Another
+            </Button>
+            <Button
+              onClick={() => {
+                if (pendingAssignedMemberName) {
+                  setFormData({ ...formData, assignedMemberName: pendingAssignedMemberName })
+                }
+                setIsCapacityWarningOpen(false)
+                setPendingAssignedMemberName("")
+              }}
+            >
+              Assign Anyway
+            </Button>
+          </div>
+        </div>
       </Modal>
     </section>
   )
