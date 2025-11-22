@@ -179,8 +179,10 @@ export default function Tasks() {
 
       if (editingTask) {
         await taskApi.updateTask(editingTask._id, payload)
+        toast.success("Task updated successfully")
       } else {
         await taskApi.createTask(payload)
+        toast.success("Task created successfully")
       }
 
       await loadData()
@@ -202,6 +204,7 @@ export default function Tasks() {
     try {
       await taskApi.deleteTask(taskToDelete)
       await loadData()
+      toast.success("Task deleted successfully")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete task")
     } finally {

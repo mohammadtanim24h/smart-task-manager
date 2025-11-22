@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Modal } from "@/components/ui/modal"
 import { ConfirmationModal } from "@/components/ui/confirmation-modal"
+import { toast } from "sonner"
 import { teamApi, type Team } from "@/lib/api"
 
 export default function Teams() {
@@ -74,6 +75,7 @@ export default function Teams() {
       await loadTeams()
       handleCloseCreateTeamModal()
       setError(null)
+      toast.success("Team created successfully")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create team")
     }
@@ -99,6 +101,7 @@ export default function Teams() {
       await loadTeams()
       handleCloseModal()
       setError(null)
+      toast.success("Member added successfully")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add member")
     }
@@ -115,6 +118,7 @@ export default function Teams() {
     try {
       await teamApi.deleteMember(memberToDelete.teamId, memberToDelete.index)
       await loadTeams()
+      toast.success("Member removed successfully")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete member")
     } finally {

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Modal } from "@/components/ui/modal"
 import { ConfirmationModal } from "@/components/ui/confirmation-modal"
+import { toast } from "sonner"
 import { projectApi, teamApi, type Project, type Team } from "@/lib/api"
 
 export default function Projects() {
@@ -70,6 +71,7 @@ export default function Projects() {
       await loadData()
       handleCloseModal()
       setError(null)
+      toast.success("Project created successfully")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create project")
     }
@@ -86,6 +88,7 @@ export default function Projects() {
     try {
       await projectApi.deleteProject(projectToDelete)
       await loadData()
+      toast.success("Project deleted successfully")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete project")
     } finally {
