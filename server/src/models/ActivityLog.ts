@@ -3,10 +3,8 @@ import mongoose from "mongoose";
 export interface IActivityLog extends mongoose.Document {
   message: string;
   taskId: mongoose.Types.ObjectId;
-  fromMemberName: string;
-  toMemberName: string;
-  fromMemberId?: mongoose.Types.ObjectId | null;
-  toMemberId?: mongoose.Types.ObjectId | null;
+  fromMemberName?: string;
+  toMemberName?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,12 +23,10 @@ const activityLogSchema = new mongoose.Schema<IActivityLog>(
     },
     fromMemberName: {
       type: String,
-      required: [true, "From member name is required"],
       trim: true,
     },
     toMemberName: {
       type: String,
-      required: [true, "To member name is required"],
       trim: true,
     },
   },

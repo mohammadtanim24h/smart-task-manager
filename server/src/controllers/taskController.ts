@@ -149,6 +149,8 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
       task.projectId = projectId as any;
     }
 
+    const oldAssignedMemberName = task.assignedMemberName;
+
     if (typeof title === "string" && title.trim().length > 0) {
       task.title = title.trim();
     }
@@ -170,6 +172,40 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     }
 
     await task.save();
+
+    // Log reassignment if applicable
+    if (
+      assignedMemberName !== undefined &&
+      oldAssignedMemberName !== task.assignedMemberName
+    ) {
+      const oldName = oldAssignedMemberName || "";
+      const newName = task.assignedMemberName || "";
+      
+      // Only log if there's an actual change involving assignment
+      if (oldName && newName) {
+        await ActivityLog.create({
+          message: `Task '${task.title}' reassigned from '${oldName}' to '${newName}'.`,
+          taskId: task._id,
+          fromMemberName: oldName,
+          toMemberName: newName,
+        });
+      }
+      else if (!oldName && newName) {
+        await ActivityLog.create({
+          message: `Unassigned Task '${task.title}' assigned to '${newName}'.`,
+          taskId: task._id,
+          fromMemberName: "",
+          toMemberName: newName,
+        });
+      } else if (!newName && oldName) {
+        await ActivityLog.create({
+          message: `Task '${task.title}' unassigned from '${oldName}'.`,
+          taskId: task._id,
+          fromMemberName: oldName,
+          toMemberName: "",
+        });
+      }
+    }
 
     res.status(200).json({
       message: "Task updated successfully",
