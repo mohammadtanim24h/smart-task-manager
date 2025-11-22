@@ -45,6 +45,27 @@ export default function Dashboard() {
         }
     }
 
+    function formatDate(dateString: string) {
+        const date = new Date(dateString);
+
+        const day = date.getDate().toString().padStart(2, "0");
+
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const month = months[date.getMonth()];
+
+        const year = date.getFullYear();
+
+        let hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, "0");
+
+        const ampm = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12 || 12; // convert 0 → 12
+        const hoursStr = hours.toString().padStart(2, "0");
+
+        return `${day} ${month} ${year}, ${hoursStr}:${minutes} ${ampm}`;
+    }
+
     if (loading) {
         return (
             <div className="flex flex-1 flex-col gap-4">
@@ -89,7 +110,7 @@ export default function Dashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">
+                        <CardTitle className="text-lg font-medium text-gray-500">
                             Total Projects
                         </CardTitle>
                     </CardHeader>
@@ -99,7 +120,7 @@ export default function Dashboard() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">
+                        <CardTitle className="text-lg font-medium text-gray-500">
                             Total Tasks
                         </CardTitle>
                     </CardHeader>
@@ -113,7 +134,7 @@ export default function Dashboard() {
                 {/* Team Workload */}
                 <Card className="col-span-1">
                     <CardHeader>
-                        <CardTitle>Team Workload</CardTitle>
+                        <CardTitle>Team Summary</CardTitle>
                         <CardDescription>
                             Current task distribution among team members.
                         </CardDescription>
@@ -150,17 +171,17 @@ export default function Dashboard() {
                             })}
                             {stats?.workload.length === 0 && (
                                 <div className="text-center text-sm text-gray-500">
-                                    No workload data available.
+                                    No team data available.
                                 </div>
                             )}
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Recent Activity */}
+                {/* Recent Reassignments */}
                 <Card className="col-span-1">
                     <CardHeader>
-                        <CardTitle>Recent Activity</CardTitle>
+                        <CardTitle>Recent Reassignments</CardTitle>
                         <CardDescription>
                             Latest task updates and reassignments.
                         </CardDescription>
@@ -182,13 +203,13 @@ export default function Dashboard() {
                                                 {log.taskId?.title || "Unknown Task"}
                                             </span>
                                         </span>
-                                        <span>{new Date(log.createdAt).toLocaleDateString()}</span>
+                                        <span>{formatDate(log.createdAt)}</span>
                                     </div>
                                 </div>
                             ))}
                             {stats?.activityLogs.length === 0 && (
                                 <div className="text-center text-sm text-gray-500">
-                                    No recent activity.
+                                    No recent reassignments.
                                 </div>
                             )}
                         </div>

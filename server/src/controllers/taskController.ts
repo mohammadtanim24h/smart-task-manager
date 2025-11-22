@@ -294,9 +294,8 @@ export const reassignTasks = async (req: Request, res: Response): Promise<void> 
           await task.save();
           updatedTasks.push(task);
 
-          const ts = new Date().toISOString();
           await ActivityLog.create({
-            message: `Task '${task.title}' reassigned from '${oldName}' to '${newName}' at ${ts}.`,
+            message: `Task '${task.title}' reassigned from '${oldName}' to '${newName}'.`,
             taskId: task._id,
             fromMemberName: oldName,
             toMemberName: newName,
