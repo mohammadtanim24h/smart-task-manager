@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -204,8 +205,11 @@ export default function Tasks() {
       setError(null)
       const res = await taskApi.reassignTasks(filterProjectId || undefined)
       await loadData()
-      if (res.message) {
-        // no-op, message available if needed
+      const count = res.tasks?.length ?? 0
+      if (count > 0) {
+        toast.success(`${count} task${count === 1 ? "" : "s"} reassigned`) 
+      } else {
+        toast.info("No tasks were reassigned")
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to reassign tasks")

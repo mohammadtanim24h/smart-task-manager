@@ -3,8 +3,10 @@ import mongoose from "mongoose";
 export interface IActivityLog extends mongoose.Document {
   message: string;
   taskId: mongoose.Types.ObjectId;
-  fromMemberId: mongoose.Types.ObjectId;
-  toMemberId: mongoose.Types.ObjectId;
+  fromMemberName: string;
+  toMemberName: string;
+  fromMemberId?: mongoose.Types.ObjectId | null;
+  toMemberId?: mongoose.Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,19 +23,19 @@ const activityLogSchema = new mongoose.Schema<IActivityLog>(
       ref: "Task",
       required: [true, "Task ID is required"],
     },
-    fromMemberId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "From member ID is required"],
+    fromMemberName: {
+      type: String,
+      required: [true, "From member name is required"],
+      trim: true,
     },
-    toMemberId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "To member ID is required"],
+    toMemberName: {
+      type: String,
+      required: [true, "To member name is required"],
+      trim: true,
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt automatically (createdAt serves as timestamp)
+    timestamps: true,
   }
 );
 

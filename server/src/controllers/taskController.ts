@@ -2,6 +2,7 @@ import { type Request, type Response } from "express";
 import { Task } from "../models/Task.js";
 import { Project, type IProject } from "../models/Project.js";
 import { Team } from "../models/Team.js";
+import { ActivityLog } from "../models/ActivityLog.js";
 
 // Helper function to verify project access
 const verifyProjectAccess = async (projectId: string, userId: string): Promise<boolean> => {
@@ -286,9 +287,20 @@ export const reassignTasks = async (req: Request, res: Response): Promise<void> 
           const recipient = recipients.find((r) => r.available > 0);
           if (!recipient) break;
 
-          task.assignedMemberName = recipient.name;
+          const oldName = task.assignedMemberName || "";
+          const newName = recipient.name;
+
+          task.assignedMemberName = newName;
           await task.save();
           updatedTasks.push(task);
+
+          const ts = new Date().toISOString();
+          await ActivityLog.create({
+            message: `Task '${task.title}' reassigned from '${oldName}' to '${newName}' at ${ts}.`,
+            taskId: task._id,
+            fromMemberName: oldName,
+            toMemberName: newName,
+          });
 
           recipient.available -= 1;
           toMove -= 1;

@@ -21,16 +21,16 @@ function App() {
             Smart Task Manager
           </Link>
           <nav className="flex items-center gap-4 text-sm font-medium">
-            <Link to="/" className="hover:text-blue-600">
+            <Link to="/" className="hover:text-primary">
               Home
             </Link>
-            <Link to="/tasks" className="hover:text-blue-600">
+            <Link to="/tasks" className="hover:text-primary">
               Tasks
             </Link>
-            <Link to="/teams" className="hover:text-blue-600">
+            <Link to="/teams" className="hover:text-primary">
               Teams
             </Link>
-            <Link to="/projects" className="hover:text-blue-600">
+            <Link to="/projects" className="hover:text-primary">
               Projects
             </Link>
             {!isLoggedIn && (
