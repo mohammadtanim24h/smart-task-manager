@@ -142,24 +142,27 @@ export default function Dashboard() {
                     <CardContent>
                         <div className="space-y-4">
                             {stats?.workload.map((member) => {
+                                const isUnassigned = member.memberName === "Unassigned";
                                 const isOverCapacity = member.count > member.capacity
                                 return (
                                     <div
                                         key={member.memberName}
-                                        className={`flex items-center justify-between rounded-lg border p-3 ${isOverCapacity ? "border-red-200 bg-red-50" : "border-gray-100"
+                                        className={`flex items-center justify-between rounded-lg border p-3 ${isOverCapacity && !isUnassigned ? "border-red-200 bg-red-50" : "border-gray-100"
                                             }`}
                                     >
                                         <div>
                                             <div className="font-medium text-gray-900">
                                                 {member.memberName}
                                             </div>
-                                            <div className="text-xs text-gray-500">
-                                                Capacity: {member.capacity}
-                                            </div>
+                                            {!isUnassigned && (
+                                                <div className="text-xs text-gray-500">
+                                                    Capacity: {member.capacity}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="text-right">
                                             <div
-                                                className={`text-lg font-bold ${isOverCapacity ? "text-red-600" : "text-gray-900"
+                                                className={`text-lg font-bold ${isOverCapacity && !isUnassigned ? "text-red-600" : "text-gray-900"
                                                     }`}
                                             >
                                                 {member.count}
@@ -178,13 +181,18 @@ export default function Dashboard() {
                     </CardContent>
                 </Card>
 
-                {/* Recent Reassignments */}
+                {/* Recent Activity */}
                 <Card className="col-span-1">
-                    <CardHeader>
-                        <CardTitle>Recent Reassignments</CardTitle>
-                        <CardDescription>
-                            Latest task updates and reassignments.
-                        </CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle>Recent Activity</CardTitle>
+                            <CardDescription>
+                                Latest task updates and reassignments.
+                            </CardDescription>
+                        </div>
+                        <Button variant="outline" size="sm" asChild>
+                            <a href="/activity-logs">View All</a>
+                        </Button>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">

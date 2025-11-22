@@ -347,3 +347,11 @@ export type DashboardStats = {
 export const dashboardApi = {
   getStats: () => getJSON<DashboardStats>("/api/dashboard"),
 }
+
+export type ActivityLogsResponse = {
+  logs: ActivityLog[]
+}
+
+export const activityLogsApi = {
+  getLogs: () => getJSON<ActivityLogsResponse>("/api/activity-logs"),
+}

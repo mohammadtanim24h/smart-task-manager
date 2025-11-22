@@ -9,6 +9,7 @@ import Projects from "@/pages/Projects"
 import Register from "@/pages/Register"
 import Tasks from "@/pages/Tasks"
 import Teams from "@/pages/Teams"
+import ActivityLogs from "@/pages/ActivityLogs"
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +46,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Projects />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "activity-logs",
+        element: (
+          <ProtectedRoute>
+            <ActivityLogs />
           </ProtectedRoute>
         ),
       },

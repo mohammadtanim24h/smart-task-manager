@@ -6,6 +6,7 @@ import teamRoutes from "./routes/teamRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import activityLogRoutes from "./routes/activityLogRoutes.js";
 import cors from "cors";
 
 const app = express();
@@ -38,6 +39,9 @@ app.use("/api/tasks", protect, taskRoutes);
 
 // Dashboard routes (protected)
 app.use("/api/dashboard", protect, dashboardRoutes);
+
+// Activity Log routes (protected)
+app.use("/api/activity-logs", protect, activityLogRoutes);
 
 // Protected route example
 app.get("/api/me", protect, (req, res) => {
