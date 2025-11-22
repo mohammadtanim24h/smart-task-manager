@@ -5,6 +5,7 @@ import { protect } from "./middleware/authMiddleware.js";
 import teamRoutes from "./routes/teamRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 import cors from "cors";
 
 const app = express();
@@ -24,16 +25,19 @@ app.get("/", (req, res) => {
 });
 
 // Auth routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", protect, authRoutes);
 
 // Team routes (protected)
-app.use("/api/teams", teamRoutes);
+app.use("/api/teams", protect, teamRoutes);
 
 // Project routes (protected)
-app.use("/api/projects", projectRoutes);
+app.use("/api/projects", protect, projectRoutes);
 
 // Task routes (protected)
-app.use("/api/tasks", taskRoutes);
+app.use("/api/tasks", protect, taskRoutes);
+
+// Dashboard routes (protected)
+app.use("/api/dashboard", protect, dashboardRoutes);
 
 // Protected route example
 app.get("/api/me", protect, (req, res) => {
