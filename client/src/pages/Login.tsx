@@ -106,9 +106,6 @@ export default function Login() {
               Create one
             </Link>
           </p>
-          <p className="text-xs">
-            By continuing you agree to our terms of service and privacy policy.
-          </p>
         </CardFooter>
       </Card>
     </section>

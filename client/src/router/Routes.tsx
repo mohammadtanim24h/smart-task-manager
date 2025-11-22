@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom"
 
 import App from "@/App"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
-import Home from "@/pages/Home"
+import Dashboard from "@/pages/Dashboard"
 import Login from "@/pages/Login"
 import NotFound from "@/pages/NotFound"
 import Projects from "@/pages/Projects"
@@ -11,47 +11,51 @@ import Tasks from "@/pages/Tasks"
 import Teams from "@/pages/Teams"
 
 export const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <App />,
-      errorElement: <NotFound />,
-      children: [
-        {
-          index: true,
-          element: <Home />,
-        },
-        {
-          path: "tasks",
-          element: (
-            <ProtectedRoute>
-              <Tasks />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "teams",
-          element: (
-            <ProtectedRoute>
-              <Teams />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "projects",
-          element: (
-            <ProtectedRoute>
-              <Projects />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "login",
-          element: <Login />,
-        },
-        {
-          path: "register",
-          element: <Register />,
-        },
-      ],
-    },
+  {
+    path: "/",
+    element: <App />,
+    errorElement: <NotFound />,
+    children: [
+      {
+        index: true,
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "tasks",
+        element: (
+          <ProtectedRoute>
+            <Tasks />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "teams",
+        element: (
+          <ProtectedRoute>
+            <Teams />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "projects",
+        element: (
+          <ProtectedRoute>
+            <Projects />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+    ],
+  },
 ])

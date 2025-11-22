@@ -58,6 +58,20 @@ export const getDashboardStats = async (req: Request, res: Response): Promise<vo
       },
     ]);
 
+    // Create a map of member capacities from userTeams
+    const memberCapacities: Record<string, number> = {};
+    userTeams.forEach((team) => {
+      team.members.forEach((member) => {
+        memberCapacities[member.name] = member.capacity;
+      });
+    });
+
+    // Add capacity to workload
+    const workloadWithCapacity = workload.map((w) => ({
+      ...w,
+      capacity: memberCapacities[w.memberName] || 0,
+    }));
+
     // 6. Get last 5 activity logs
     const tasks = await Task.find({ projectId: { $in: projectIds } }).select("_id");
     const taskIds = tasks.map((t) => t._id);
@@ -70,7 +84,7 @@ export const getDashboardStats = async (req: Request, res: Response): Promise<vo
     res.status(200).json({
       totalProjects,
       totalTasks,
-      workload,
+      workload: workloadWithCapacity,
       activityLogs,
     });
   } catch (error) {

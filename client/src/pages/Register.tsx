@@ -107,7 +107,7 @@ export default function Register() {
             {success && (
               <p className="text-sm font-medium text-emerald-600">{success}</p>
             )}
-            
+
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Creating account..." : "Create account"}
             </Button>
@@ -119,10 +119,6 @@ export default function Register() {
             <Link to="/login" className="text-primary hover:underline">
               Sign in
             </Link>
-          </p>
-          <p className="text-xs">
-            We&apos;ll email you occasional product updates. You can unsubscribe
-            at any time.
           </p>
         </CardFooter>
       </Card>

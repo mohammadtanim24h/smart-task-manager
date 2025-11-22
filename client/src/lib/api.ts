@@ -317,3 +317,33 @@ export const taskApi = {
     postJSON<TasksResponse>("/api/tasks/reassign", projectId ? { projectId } : {}),
 }
 
+export type Workload = {
+  memberName: string
+  count: number
+  pending: number
+  inProgress: number
+  done: number
+  capacity: number
+}
+
+export type ActivityLog = {
+  _id: string
+  message: string
+  taskId: {
+    _id: string
+    title: string
+  }
+  fromMemberName: string
+  createdAt: string
+}
+
+export type DashboardStats = {
+  totalProjects: number
+  totalTasks: number
+  workload: Workload[]
+  activityLogs: ActivityLog[]
+}
+
+export const dashboardApi = {
+  getStats: () => getJSON<DashboardStats>("/api/dashboard"),
+}

@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 });
 
 // Auth routes
-app.use("/api/auth", protect, authRoutes);
+app.use("/api/auth", authRoutes);
 
 // Team routes (protected)
 app.use("/api/teams", protect, teamRoutes);
