@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Modal } from "@/components/ui/modal"
+import { ConfirmationModal } from "@/components/ui/confirmation-modal"
 import { taskApi, projectApi, type Task, type Project, type ProjectMember } from "@/lib/api"
 
 export default function Tasks() {
@@ -29,6 +30,8 @@ export default function Tasks() {
   const [membersLoading, setMembersLoading] = useState(false)
   const [isCapacityWarningOpen, setIsCapacityWarningOpen] = useState(false)
   const [pendingAssignedMemberName, setPendingAssignedMemberName] = useState<string>("")
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null)
 
   const autoAssignLowestWorkload = async () => {
     if (!formData.projectId) return
@@ -189,13 +192,20 @@ export default function Tasks() {
   }
 
   const handleDeleteTask = async (taskId: string) => {
-    if (!confirm("Are you sure you want to delete this task?")) return
+    setTaskToDelete(taskId)
+    setIsDeleteModalOpen(true)
+  }
+
+  const confirmDeleteTask = async () => {
+    if (!taskToDelete) return
 
     try {
-      await taskApi.deleteTask(taskId)
+      await taskApi.deleteTask(taskToDelete)
       await loadData()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete task")
+    } finally {
+      setTaskToDelete(null)
     }
   }
 
@@ -700,6 +710,13 @@ export default function Tasks() {
           </div>
         </div>
       </Modal>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDeleteTask}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+      />
     </section>
   )
 }

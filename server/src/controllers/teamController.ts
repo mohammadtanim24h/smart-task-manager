@@ -1,5 +1,7 @@
 import { type Request, type Response } from "express";
 import { Team } from "../models/Team.js";
+import { Task } from "../models/Task.js";
+import { Project } from "../models/Project.js";
 
 export const createTeam = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -259,8 +261,33 @@ export const deleteMember = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
+    const member = team.members[index];
+    if (!member) {
+      res.status(404).json({ message: "Member not found" });
+      return;
+    }
+
+    const deletedMemberName = member.name;
+
     team.members.splice(index, 1);
+    
     await team.save();
+
+    // Unassign all tasks that were assigned to this member
+    // Find all projects that belong to this team
+    const projects = await Project.find({ teamId: team._id });
+    const projectIds = projects.map((p) => p._id);
+
+    // Update all tasks assigned to the deleted member to unassign them
+    await Task.updateMany(
+      {
+        projectId: { $in: projectIds },
+        assignedMemberName: deletedMemberName,
+      },
+      {
+        $set: { assignedMemberName: null },
+      }
+    );
 
     res.status(200).json({
       message: "Member deleted successfully",

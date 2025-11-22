@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Modal } from "@/components/ui/modal"
+import { ConfirmationModal } from "@/components/ui/confirmation-modal"
 import { projectApi, teamApi, type Project, type Team } from "@/lib/api"
 
 export default function Projects() {
@@ -17,6 +18,8 @@ export default function Projects() {
     description: "",
     teamId: "",
   })
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
 
   useEffect(() => {
     loadData()
@@ -73,13 +76,20 @@ export default function Projects() {
   }
 
   const handleDeleteProject = async (projectId: string) => {
-    if (!confirm("Are you sure you want to delete this project?")) return
+    setProjectToDelete(projectId)
+    setIsDeleteModalOpen(true)
+  }
+
+  const confirmDeleteProject = async () => {
+    if (!projectToDelete) return
 
     try {
-      await projectApi.deleteProject(projectId)
+      await projectApi.deleteProject(projectToDelete)
       await loadData()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete project")
+    } finally {
+      setProjectToDelete(null)
     }
   }
 
@@ -250,6 +260,13 @@ export default function Projects() {
           </div>
         </form>
       </Modal>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDeleteProject}
+        title="Delete Project"
+        message="Are you sure you want to delete this project? This action cannot be undone."
+      />
     </section>
   )
 }

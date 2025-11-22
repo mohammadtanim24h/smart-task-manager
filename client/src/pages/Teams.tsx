@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Modal } from "@/components/ui/modal"
+import { ConfirmationModal } from "@/components/ui/confirmation-modal"
 import { teamApi, type Team } from "@/lib/api"
 
 export default function Teams() {
@@ -21,6 +22,8 @@ export default function Teams() {
   const [createTeamFormData, setCreateTeamFormData] = useState({
     name: "",
   })
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [memberToDelete, setMemberToDelete] = useState<{ teamId: string; index: number } | null>(null)
 
   useEffect(() => {
     loadTeams()
@@ -102,13 +105,20 @@ export default function Teams() {
   }
 
   const handleDeleteMember = async (teamId: string, memberIndex: number) => {
-    if (!confirm("Are you sure you want to remove this member?")) return
+    setMemberToDelete({ teamId, index: memberIndex })
+    setIsDeleteModalOpen(true)
+  }
+
+  const confirmDeleteMember = async () => {
+    if (!memberToDelete) return
 
     try {
-      await teamApi.deleteMember(teamId, memberIndex)
+      await teamApi.deleteMember(memberToDelete.teamId, memberToDelete.index)
       await loadTeams()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete member")
+    } finally {
+      setMemberToDelete(null)
     }
   }
 
@@ -333,6 +343,14 @@ export default function Teams() {
           </div>
         </form>
       </Modal>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDeleteMember}
+        title="Remove Member"
+        message="Are you sure you want to remove this member from the team? This action cannot be undone."
+        confirmText="Remove"
+      />
     </section>
   )
 }
