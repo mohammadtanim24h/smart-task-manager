@@ -217,7 +217,7 @@ export default function Dashboard() {
                             ))}
                             {stats?.activityLogs.length === 0 && (
                                 <div className="text-center text-sm text-gray-500">
-                                    No recent reassignments.
+                                    No recent activity.
                                 </div>
                             )}
                         </div>

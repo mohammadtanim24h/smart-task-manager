@@ -186,6 +186,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         await ActivityLog.create({
           message: `Task '${task.title}' reassigned from '${oldName}' to '${newName}'.`,
           taskId: task._id,
+          userId: req.user.id,
           fromMemberName: oldName,
           toMemberName: newName,
         });
@@ -194,6 +195,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         await ActivityLog.create({
           message: `Unassigned Task '${task.title}' assigned to '${newName}'.`,
           taskId: task._id,
+          userId: req.user.id,
           fromMemberName: "",
           toMemberName: newName,
         });
@@ -201,6 +203,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         await ActivityLog.create({
           message: `Task '${task.title}' unassigned from '${oldName}'.`,
           taskId: task._id,
+          userId: req.user.id,
           fromMemberName: oldName,
           toMemberName: "",
         });
@@ -333,6 +336,7 @@ export const reassignTasks = async (req: Request, res: Response): Promise<void> 
           await ActivityLog.create({
             message: `Task '${task.title}' reassigned from '${oldName}' to '${newName}'.`,
             taskId: task._id,
+            userId: req.user.id,
             fromMemberName: oldName,
             toMemberName: newName,
           });

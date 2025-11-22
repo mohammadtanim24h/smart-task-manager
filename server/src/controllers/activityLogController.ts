@@ -8,7 +8,7 @@ export const getActivityLogs = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    const logs = await ActivityLog.find()
+    const logs = await ActivityLog.find({ userId: req.user.id })
       .sort({ createdAt: -1 })
       .populate("taskId", "title");
 

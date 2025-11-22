@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 export interface IActivityLog extends mongoose.Document {
   message: string;
   taskId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   fromMemberName?: string;
   toMemberName?: string;
   createdAt: Date;
@@ -20,6 +21,11 @@ const activityLogSchema = new mongoose.Schema<IActivityLog>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Task",
       required: [true, "Task ID is required"],
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "User ID is required"],
     },
     fromMemberName: {
       type: String,
