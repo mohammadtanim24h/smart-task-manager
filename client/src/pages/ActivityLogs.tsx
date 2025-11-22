@@ -36,7 +36,7 @@ export default function ActivityLogs() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Activity Log</h1>
                     <p className="text-muted-foreground">
-                        View all system activities and task updates.
+                        View all task updates.
                     </p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => navigate("/")}>

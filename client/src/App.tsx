@@ -26,7 +26,7 @@ function App() {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 text-gray-900">
       <header className="border-b bg-white sticky top-0 z-50">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link to="/" className="text-xl font-semibold">
             Smart Task Manager
           </Link>
@@ -96,7 +96,7 @@ function App() {
           </div>
         )}
       </header>
-      <main className="mx-auto flex w-full max-w-4xl flex-1 px-6 py-8">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 px-6 py-8">
         <Outlet />
       </main>
     </div>
