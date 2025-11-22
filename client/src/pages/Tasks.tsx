@@ -207,7 +207,7 @@ export default function Tasks() {
       await loadData()
       const count = res.tasks?.length ?? 0
       if (count > 0) {
-        toast.success(`${count} task${count === 1 ? "" : "s"} reassigned`) 
+        toast.success(`${count} task${count === 1 ? "" : "s"} reassigned`)
       } else {
         toast.info("No tasks were reassigned")
       }
@@ -313,7 +313,7 @@ export default function Tasks() {
 
   return (
     <section className="flex flex-1 flex-col gap-4">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col md:flex-row md:items-center justify-between space-y-2 md:space-y-0">
         <div>
           <p className="text-sm uppercase tracking-wide text-gray-500">Tasks</p>
           <h1 className="text-3xl font-bold text-gray-900">Your task board</h1>
@@ -322,25 +322,25 @@ export default function Tasks() {
           </p>
         </div>
         <div className="flex gap-2">
-        <Button onClick={() => handleOpenModal()} disabled={projects.length === 0}>
-          <svg
-            className="mr-2 h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          Create Task
-        </Button>
-        <Button variant="outline" onClick={handleReassignTasks} disabled={projects.length === 0}>
-          Reassign Tasks
-        </Button>
+          <Button onClick={() => handleOpenModal()} disabled={projects.length === 0}>
+            <svg
+              className="mr-2 h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Create Task
+          </Button>
+          <Button variant="outline" onClick={handleReassignTasks} disabled={projects.length === 0}>
+            Reassign Tasks
+          </Button>
         </div>
       </header>
 
@@ -418,100 +418,100 @@ export default function Tasks() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredTasks.map((task) => (
-            <Card key={task._id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{task.title}</CardTitle>
-                    <CardDescription className="mt-1">
-                      {getProjectName(task)}
-                    </CardDescription>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => handleOpenModal(task)}
-                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                    >
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                        />
-                      </svg>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => handleDeleteTask(task._id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600 line-clamp-3">{task.description}</p>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Assigned Member:</span>
-                      <span className="font-medium text-gray-900">
-                        {getAssignedMemberName(task)}
-                      </span>
+                <Card key={task._id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{task.title}</CardTitle>
+                        <CardDescription className="mt-1">
+                          {getProjectName(task)}
+                        </CardDescription>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => handleOpenModal(task)}
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                          </svg>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => handleDeleteTask(task._id)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </Button>
+                      </div>
                     </div>
-                    
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Priority:</span>
-                      <span
-                        className={`rounded-full border px-2 py-1 text-xs font-medium ${getPriorityColor(
-                          task.priority
-                        )}`}
-                      >
-                        {task.priority}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Status:</span>
-                      <span
-                        className={`rounded-full border px-2 py-1 text-xs font-medium ${getStatusColor(
-                          task.status
-                        )}`}
-                      >
-                        {task.status}
-                      </span>
-                    </div>
-                  </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-600 line-clamp-3">{task.description}</p>
 
-                  <div className="pt-2 text-xs text-gray-500">
-                    Created: {new Date(task.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500">Assigned Member:</span>
+                          <span className="font-medium text-gray-900">
+                            {getAssignedMemberName(task)}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500">Priority:</span>
+                          <span
+                            className={`rounded-full border px-2 py-1 text-xs font-medium ${getPriorityColor(
+                              task.priority
+                            )}`}
+                          >
+                            {task.priority}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500">Status:</span>
+                          <span
+                            className={`rounded-full border px-2 py-1 text-xs font-medium ${getStatusColor(
+                              task.status
+                            )}`}
+                          >
+                            {task.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 text-xs text-gray-500">
+                        Created: {new Date(task.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}

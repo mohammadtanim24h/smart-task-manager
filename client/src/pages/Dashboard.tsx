@@ -94,7 +94,7 @@ export default function Dashboard() {
 
     return (
         <div className="flex flex-1 flex-col gap-6">
-            <header className="flex items-center justify-between">
+            <header className="flex flex-col md:flex-row md:items-center justify-between space-y-2 md:space-y-0">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
                     <p className="mt-2 text-gray-600">

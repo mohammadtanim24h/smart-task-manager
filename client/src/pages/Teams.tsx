@@ -129,7 +129,7 @@ export default function Teams() {
   return (
     <section className="flex flex-1 flex-col gap-4">
       <header>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between space-y-2 md:space-y-0">
           <div>
             <p className="text-sm uppercase tracking-wide text-gray-500">Teams</p>
             <h1 className="text-3xl font-bold text-gray-900">Team Management</h1>
